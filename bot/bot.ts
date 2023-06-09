@@ -1,7 +1,15 @@
 import * as TelegramBot from 'node-telegram-bot-api';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 //token
-const token = 'Token';
+const token = process.env.BOT_TOKEN;
+
+if (!token) {
+    console.error('BOT_TOKEN not found in environment variables');
+    process.exit(1);
+  }
 
 //bot instance
 const bot = new TelegramBot(token, { polling: true });
