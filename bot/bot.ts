@@ -20,10 +20,5 @@ bot.onText(/\/start/, (msg) => {
   bot.sendMessage(chatId, 'Привіт, вітаю вас!');
 });
 
-bot.onText(/привіт/i, (msg) => {
-  const chatId = msg.chat.id;
-  bot.sendMessage(chatId, 'Привіт, я простий бот Telegram!');
-});
-
 //bot start
 console.log('The bot is running!');
