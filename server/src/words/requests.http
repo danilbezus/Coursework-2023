@@ -1,0 +1,10 @@
+### Create a new word
+POST http://localhost:3000/words/
+content-type: application/json
+
+{
+  "word": "parrot",
+  "definition": "flying bird",
+  "example": "I have a parrot living at home",
+  "pronunciation": "[ˈpær.ət]"
+}
