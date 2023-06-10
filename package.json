@@ -1,0 +1,25 @@
+{
+  "name": "coursework-2023",
+  "version": "1.0.0",
+  "description": "My and DanilByaliy's work",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danilbezus/Coursework-2023.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/danilbezus/Coursework-2023/issues"
+  },
+  "homepage": "https://github.com/danilbezus/Coursework-2023#readme",
+  "dependencies": {
+    "@types/node-telegram-bot-api": "^0.61.6",
+    "dotenv": "^16.1.4",
+    "node-telegram-bot-api": "^0.61.0"
+  }
+}
