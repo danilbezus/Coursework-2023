@@ -1,5 +1,5 @@
 ### Create a new word
-POST http://localhost:3000/words/
+POST http://localhost:3000/parsing/
 content-type: application/json
 
 {
