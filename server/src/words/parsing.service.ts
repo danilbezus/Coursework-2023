@@ -23,7 +23,7 @@ export default class ParsingService {
 
       return { definition, example, pronunciation };
     } catch (error) {
-      console.log(error);
+      console.error();
       throw error;
     }
   }
