@@ -16,14 +16,19 @@ export class WordsService {
 
     const { translation, definition, example, pronunciation, partsOfSpeech } =
       firstOption;
-    const newWord = this.repo.create({
-      word,
-      translation,
-      definition,
-      example,
-      pronunciation,
-      partsOfSpeech,
+    const existingWord = await this.repo.findOne({
+      where: [{ word }, { translation }],
     });
-    return this.repo.save(newWord);
+    if (!existingWord) {
+      const newWord = this.repo.create({
+        word,
+        translation,
+        definition,
+        example,
+        pronunciation,
+        partsOfSpeech,
+      });
+      return this.repo.save(newWord);
+    }
   }
 }

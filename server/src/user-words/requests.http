@@ -1,0 +1,8 @@
+### Create a new word
+POST http://localhost:3000/user-words/
+content-type: application/json
+
+{
+  "userId": 95,
+  "wordId": 8
+}

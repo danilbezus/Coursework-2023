@@ -20,7 +20,7 @@ bot.onText(/\/start/, (msg) => {
   bot.sendMessage(chatId, "Привіт, вітаю вас!");
 });
 
-bot.onText(/\/parse (.+)/, async (msg, match) => {
+bot.onText(/\/newWord (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
 
   if (match && match[1]) {
@@ -35,20 +35,28 @@ bot.onText(/\/parse (.+)/, async (msg, match) => {
 
       const result = await response.json();
 
-      if (Object.keys(result).length === 0) {
-        throw new Error('Об\'єкт порожній');
-      }
-
-      await bot.sendMessage(chatId, 'Виберіть один з варіантів:');
+      const options = {
+        reply_markup: {
+          keyboard: [],
+          resize_keyboard: true,
+          one_time_keyboard: true,
+        },
+      };
 
       for (const key of Object.keys(result)) {
         const wordOption = result[key];
+        const buttonText = wordOption.translation; //button name
+
+        options.reply_markup.keyboard.push([{ text: buttonText }]);
+
         const message = formatMessage(wordOption);
         await bot.sendMessage(chatId, message);
       }
+
+      await bot.sendMessage(chatId, 'Виберіть один з варіантів:', options);
     } catch (error) {
       console.error(error);
-      await bot.sendMessage(chatId, 'Помилка при обробці запиту або слово не існує.');
+      await bot.sendMessage(chatId, 'Помилка при обробці запиту.');
     }
   } else {
     bot.sendMessage(chatId, 'Некоректний формат команди. Введіть команду у форматі /parse <слово>.');
