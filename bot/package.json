@@ -2,7 +2,7 @@
   "name": "coursework-2023",
   "version": "1.0.0",
   "description": "My and DanilByaliy's work",
-  "main": "index.js",
+  "main": "src/bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -18,11 +18,8 @@
   },
   "homepage": "https://github.com/danilbezus/Coursework-2023#readme",
   "dependencies": {
-    "@nestjs/typeorm": "^9.0.1",
     "@types/node-telegram-bot-api": "^0.61.6",
     "dotenv": "^16.1.4",
-    "node-telegram-bot-api": "^0.61.0",
-    "sqlite3": "^5.1.6",
-    "typeorm": "^0.3.16"
+    "node-telegram-bot-api": "^0.61.0"
   }
 }
