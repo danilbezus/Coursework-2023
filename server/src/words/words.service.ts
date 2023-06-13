@@ -10,14 +10,19 @@ export class WordsService {
 
   async create(word: string) {
     const parsingService = new ParsingService();
-    const { definition, example, pronunciation } = await parsingService.getPage(
-      word.toLowerCase(),
-    );
+
+    const wordOptions = await parsingService.getPage(word.toLowerCase());
+    const firstOption = Object.values(wordOptions)[0];
+
+    const { translation, definition, example, pronunciation, partsOfSpeech } =
+      firstOption;
     const newWord = this.repo.create({
       word,
+      translation,
       definition,
       example,
       pronunciation,
+      partsOfSpeech,
     });
     return this.repo.save(newWord);
   }

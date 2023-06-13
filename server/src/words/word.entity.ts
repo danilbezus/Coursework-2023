@@ -9,6 +9,8 @@ export class Word {
   word: string;
 
   @Column()
+  translation: string;
+  @Column()
   definition: string;
 
   @Column()
@@ -16,4 +18,7 @@ export class Word {
 
   @Column()
   pronunciation: string;
+
+  @Column()
+  partsOfSpeech: string;
 }
