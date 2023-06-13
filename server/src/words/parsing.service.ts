@@ -1,4 +1,7 @@
 import { JSDOM } from 'jsdom';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 const site = process.env.PARSINGSITE;
 

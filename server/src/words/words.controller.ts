@@ -8,11 +8,6 @@ export class WordsController {
 
   @Post()
   createWord(@Body() body: CreateWordDto) {
-    this.wordsService.create(
-      body.word,
-      body.definition,
-      body.example,
-      body.pronunciation,
-    );
+    this.wordsService.create(body.word);
   }
 }
