@@ -20,20 +20,32 @@ export default class ParsingService {
       const wordOptions = {};
       for (let i = 0; i < max; i++) {
         const wordOption = {
-          translation:
-            dom.window.document.getElementsByClassName('trans dtrans')[i]
-              .innerHTML,
-          definition: dom.window.document
-            .getElementsByClassName('def ddef_d db')
-            [i].textContent.trim(),
-          example: dom.window.document
-            .getElementsByClassName('examp dexamp')
-            [i].textContent.trim(),
-          pronunciation:
-            dom.window.document.getElementsByClassName('ipa dipa')[0].innerHTML,
+          translation: elements[i].getElementsByClassName('trans dtrans')[0]
+            ? elements[i].getElementsByClassName('trans dtrans')[0].innerHTML
+            : '-',
+          definition: elements[i].getElementsByClassName('def ddef_d db')[0]
+            ? elements[i]
+                .getElementsByClassName('def ddef_d db')[0]
+                .textContent.trim()
+            : '-',
+          example: elements[i].getElementsByClassName('examp dexamp')[0]
+            ? elements[i]
+                .getElementsByClassName('examp dexamp')[0]
+                .textContent.trim()
+            : '-',
+          pronunciation: dom.window.document.getElementsByClassName(
+            'ipa dipa',
+          )[0]
+            ? dom.window.document.getElementsByClassName('ipa dipa')[0]
+                .innerHTML
+            : '-',
           partsOfSpeech: elements[i]
             .closest('.link.dlink')
-            .getElementsByClassName('pos dpos')[0].innerHTML,
+            .getElementsByClassName('pos dpos')[0]
+            ? elements[i]
+                .closest('.link.dlink')
+                .getElementsByClassName('pos dpos')[0].innerHTML
+            : '-',
         };
 
         wordOptions['wordOption' + i] = wordOption;

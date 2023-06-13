@@ -35,6 +35,10 @@ bot.onText(/\/parse (.+)/, async (msg, match) => {
 
       const result = await response.json();
 
+      if (Object.keys(result).length === 0) {
+        throw new Error('Об\'єкт порожній');
+      }
+
       await bot.sendMessage(chatId, 'Виберіть один з варіантів:');
 
       for (const key of Object.keys(result)) {
@@ -44,7 +48,7 @@ bot.onText(/\/parse (.+)/, async (msg, match) => {
       }
     } catch (error) {
       console.error(error);
-      await bot.sendMessage(chatId, 'Помилка при обробці запиту.');
+      await bot.sendMessage(chatId, 'Помилка при обробці запиту або слово не існує.');
     }
   } else {
     bot.sendMessage(chatId, 'Некоректний формат команди. Введіть команду у форматі /parse <слово>.');
