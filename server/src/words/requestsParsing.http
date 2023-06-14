@@ -1,4 +1,4 @@
-### Create a new word
+### Parse a new word
 POST http://localhost:3000/parsing/
 content-type: application/json
 

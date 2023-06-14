@@ -1,0 +1,14 @@
+### Create a new word
+POST http://localhost:3000/words/
+content-type: application/json
+
+{
+  "word": "pen",
+  "wordOption": {
+    "translation": "string",
+    "definition": "string",
+    "example": "string",
+    "pronunciation": "string",
+    "partsOfSpeech": "string"
+  }
+}
