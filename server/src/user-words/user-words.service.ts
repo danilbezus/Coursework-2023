@@ -16,4 +16,7 @@ export class UserWordsService {
     });
     return this.repo.save(newUserWord);
   }
+  async get(userId: number) {
+    return this.repo.find({ where: { userId } });
+  }
 }
