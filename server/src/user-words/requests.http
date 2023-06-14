@@ -1,3 +1,0 @@
-### Get users words
-GET http://localhost:3000/user-words/?userId=469947316
-content-type: application/json

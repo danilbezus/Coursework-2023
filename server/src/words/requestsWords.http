@@ -1,3 +1,0 @@
-### Get word
-GET http://localhost:3000/words/?id=24
-content-type: application/json
