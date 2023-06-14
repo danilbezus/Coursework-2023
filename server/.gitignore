@@ -40,4 +40,4 @@ lerna-debug.log*
 #JS files
 *.js
 
-!eslint.js
+!.eslintrc.js
