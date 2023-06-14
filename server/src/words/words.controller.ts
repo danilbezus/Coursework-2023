@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
 import { CreateWordDto } from './dtos/create-word.dto';
 import { WordsService } from './words.service';
 import { Response } from 'express';
@@ -12,5 +12,12 @@ export class WordsController {
     const result = await this.wordsService.create(body.word, body.wordOption);
     const { id } = result;
     return res.send({ id });
+  }
+
+  @Get()
+  async getWords(@Query('id') id: number, @Res() res: Response) {
+    const result = await this.wordsService.get(id);
+    console.log(result);
+    return res.send(result);
   }
 }

@@ -28,4 +28,8 @@ export class WordsService {
       return existingWord;
     }
   }
+  async get(id: number) {
+    const [word] = await this.repo.find({ where: { id } });
+    return word;
+  }
 }

@@ -20,7 +20,7 @@ bot.onText(/\/start/, (msg) => {
   bot.sendMessage(chatId, 'Привіт, вітаю вас!');
 });
 
-bot.onText(/\/newWord (.+)/, async (msg, match) => {
+bot.onText(/\/newword (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
 
   if (match && match[1]) {
@@ -153,7 +153,7 @@ bot.onText(/\/newWord (.+)/, async (msg, match) => {
   }
 });
 
-bot.onText(/\/myWords/, async (msg) => {
+bot.onText(/\/mywords/, async (msg) => {
   const chatId = msg.chat.id;
 
   try {
@@ -170,20 +170,42 @@ bot.onText(/\/myWords/, async (msg) => {
       (userWord: { wordId: number }) => userWord.wordId,
     );
 
-    console.log(wordIds);
+    const words = [];
+    for (const id of wordIds) {
+      const word = await fetch(`http://localhost:3000/words/?id=${id}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      words.push(await word.json());
+    }
+    bot.sendMessage(chatId, 'Ваші слова:');
+    for (const word of words) {
+      const message = formatMessage(word);
+      await bot.sendMessage(chatId, message);
+    }
+
+    //console.log(words);
   } catch (error) {
     console.error(error);
     await bot.sendMessage(chatId, 'Помилка при обробці запиту.');
   }
 });
 
-function formatMessage(wordOption: any): string {
-  return `
-Translation: ${wordOption.translation}
-Definition: ${wordOption.definition}
-Example: ${wordOption.example}
-Pronunciation: ${wordOption.pronunciation}
-Parts of Speech: ${wordOption.partsOfSpeech}`.trim();
+function formatMessage(word: any): string {
+  let message = '';
+  if (word.hasOwnProperty('word')) {
+    message += `
+Id: ${word.id}
+Word: ${word.word}`;
+  }
+  message += `
+Translation: ${word.translation}
+Definition: ${word.definition}
+Example: ${word.example}
+Pronunciation: ${word.pronunciation}
+Parts of Speech: ${word.partsOfSpeech}`;
+  console.log(message.trim());
+  return message.trim();
 }
 
 //bot start

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
 import { CreateWordDto } from './dtos/create-userWords.dto';
 import { UserWordsService } from './user-words.service';
 import { Response } from 'express';
