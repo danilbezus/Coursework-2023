@@ -35,66 +35,14 @@ bot.onText(/\/newword (.+)/, async (msg, match) => {
 
       const wordOptions = await parsingResponse.json();
 
-      const options = {
-        reply_markup: {
-          keyboard: [],
-          resize_keyboard: true,
-          one_time_keyboard: true,
-        },
-      };
-
       const selectedWord = {};
       if (Object.keys(wordOptions).length > 1) {
-        const arrMessage = [];
-        const arrTranslation = [];
-        for (const key of Object.keys(wordOptions)) {
-          const wordOption = wordOptions[key];
-          const buttonText = wordOption.translation; //button name
-
-          options.reply_markup.keyboard.push([{ text: buttonText }]);
-
-          const message = formatMessage(wordOption);
-          arrMessage.push(message);
-          arrTranslation.push(wordOption.translation);
-        }
-
-        await bot.sendMessage(chatId, 'Виберіть один з варіантів:', options);
-        for (const message of arrMessage) {
-          await bot.sendMessage(chatId, message);
-        }
-
-        let isTranslationSelected = false;
-
-        const selectedTranslationPromise = new Promise((resolve) => {
-          bot.onText(
-            new RegExp(arrTranslation.join('|')),
-            async (msg, match) => {
-              if (!isTranslationSelected) {
-                //flag check
-                const selectedTranslation = match[0]; //get the text of the pressed button
-                const selectedIndex =
-                  arrTranslation.indexOf(selectedTranslation); //get the index of the selected button
-
-                if (selectedIndex !== -1) {
-                  const selectedOption =
-                    wordOptions[Object.keys(wordOptions)[selectedIndex]];
-
-                  bot.sendMessage(
-                    chatId,
-                    `Ви вибрали переклад: ${match[0]}`,
-                    { reply_markup: { remove_keyboard: true } }, //close keyboard
-                  );
-
-                  isTranslationSelected = true;
-                  resolve(selectedOption); //resolve the promise with the selected option
-                }
-              }
-            },
-          );
-        });
-
-        const selectedOption = await selectedTranslationPromise; //wait for the promise to be resolved
-        Object.assign(selectedWord, selectedOption);
+        await handleKeySelection(
+          wordOptions,
+          'translation',
+          selectedWord,
+          chatId,
+        );
       } else if (Object.keys(wordOptions).length === 1) {
         const wordOption = wordOptions[Object.keys(wordOptions)[0]];
         Object.assign(selectedWord, wordOption);
@@ -178,7 +126,7 @@ bot.onText(/\/mywords/, async (msg) => {
       });
       words.push(await word.json());
     }
-    bot.sendMessage(chatId, 'Ваші слова:');
+    await bot.sendMessage(chatId, 'Ваші слова:');
     for (const word of words) {
       const message = formatMessage(word);
       await bot.sendMessage(chatId, message);
@@ -203,6 +151,93 @@ Example: ${word.example}
 Pronunciation: ${word.pronunciation}
 Parts of Speech: ${word.partsOfSpeech}`;
   return message.trim();
+}
+
+async function handleKeySelection(
+  wordOptions: { string: string },
+  selectedKey: string,
+  selectedWord: {},
+  chatId: TelegramBot.ChatId,
+) {
+  const options = {
+    reply_markup: {
+      keyboard: [],
+      resize_keyboard: true,
+      one_time_keyboard: true,
+    },
+  };
+
+  const arrMessage = [];
+  const arrKey = [];
+  for (const key of Object.keys(wordOptions)) {
+    const wordOption = wordOptions[key];
+    const buttonText = wordOption[selectedKey]; //button name
+
+    options.reply_markup.keyboard.push([{ text: buttonText }]);
+
+    const message = formatMessage(wordOption);
+    arrMessage.push(message);
+    arrKey.push(wordOption[selectedKey]);
+  }
+
+  if (selectedKey === 'definition') {
+    await bot.sendMessage(
+      chatId,
+      'Схоже, що слово має декілька однакових перекладів з різними визначеннями',
+    );
+  }
+  await bot.sendMessage(chatId, 'Виберіть один з варіантів:', options);
+  for (const message of arrMessage) {
+    await bot.sendMessage(chatId, message);
+  }
+
+  let isTranslationSelected = false;
+  const selectedTranslationPromise = new Promise((resolve) => {
+    bot.onText(new RegExp(arrKey.join('|')), async (msg, match) => {
+      if (!isTranslationSelected) {
+        //flag check
+        const selectedKeyValue = match[0]; //get the text of the pressed button
+        const selectedIndex = arrKey.indexOf(selectedKeyValue); //get the index of the selected button
+
+        if (selectedIndex !== -1) {
+          const selectedOption = Object.values(wordOptions)[selectedIndex];
+
+          if (selectedKey === 'translation') {
+            const duplicateTranslations = arrKey.filter(
+              (translation) => translation === selectedKeyValue,
+            );
+
+            if (duplicateTranslations.length > 1) {
+              isTranslationSelected = true; //prevent the handler function from being called again
+              const result = await handleKeySelection(
+                wordOptions,
+                'definition',
+                selectedWord,
+                chatId,
+              );
+              resolve(result);
+              return;
+            }
+            bot.sendMessage(
+              msg.chat.id,
+              `Ви вибрали переклад: ${selectedKeyValue}`,
+              { reply_markup: { remove_keyboard: true } }, //close keyboard
+            );
+          } else {
+            bot.sendMessage(
+              msg.chat.id,
+              `Ви вибрали визначення: ${selectedKeyValue}`,
+              { reply_markup: { remove_keyboard: true } }, //close keyboard
+            );
+          }
+          isTranslationSelected = true;
+          resolve(selectedOption); //resolve the promise with the selected option
+        }
+      }
+    });
+  });
+  const selectedOption = await selectedTranslationPromise; //wait for the promise to be resolved
+  Object.assign(selectedWord, selectedOption);
 }
 
 //bot start

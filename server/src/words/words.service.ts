@@ -12,7 +12,7 @@ export class WordsService {
     const { translation, definition, example, pronunciation, partsOfSpeech } =
       wordOption;
     const existingWord = await this.repo.findOne({
-      where: { word, translation },
+      where: { word, translation, definition },
     });
     if (!existingWord) {
       const newWord = this.repo.create({

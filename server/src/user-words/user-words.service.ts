@@ -10,12 +10,20 @@ export class UserWordsService {
   ) {}
 
   async create(userId: number, wordId: number) {
-    const newUserWord = this.repo.create({
-      userId,
-      wordId,
+    const existingWord = await this.repo.findOne({
+      where: { userId, wordId },
     });
-    return this.repo.save(newUserWord);
+    if (!existingWord) {
+      const newUserWord = this.repo.create({
+        userId,
+        wordId,
+      });
+      return this.repo.save(newUserWord);
+    } else {
+      return existingWord;
+    }
   }
+
   async get(userId: number) {
     return this.repo.find({ where: { userId } });
   }
