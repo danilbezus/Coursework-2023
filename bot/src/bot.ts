@@ -158,6 +158,7 @@ async function handleKeySelection(
   selectedKey: string,
   selectedWord: {},
   chatId: TelegramBot.ChatId,
+  duplicate?: string,
 ) {
   const options = {
     reply_markup: {
@@ -171,6 +172,9 @@ async function handleKeySelection(
   const arrKey = [];
   for (const key of Object.keys(wordOptions)) {
     const wordOption = wordOptions[key];
+    if (selectedKey === 'definition') {
+      if (duplicate !== wordOption.translation) continue;
+    }
     const buttonText = wordOption[selectedKey]; //button name
 
     options.reply_markup.keyboard.push([{ text: buttonText }]);
@@ -214,6 +218,7 @@ async function handleKeySelection(
                 'definition',
                 selectedWord,
                 chatId,
+                selectedKeyValue,
               );
               resolve(result);
               return;
