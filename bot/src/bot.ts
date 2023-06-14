@@ -1,5 +1,5 @@
-import * as TelegramBot from "node-telegram-bot-api";
-import * as dotenv from "dotenv";
+import * as TelegramBot from 'node-telegram-bot-api';
+import * as dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -7,7 +7,7 @@ dotenv.config();
 const token = process.env.BOT_TOKEN;
 
 if (!token) {
-  console.error("BOT_TOKEN not found in environment variables");
+  console.error('BOT_TOKEN not found in environment variables');
   process.exit(1);
 }
 
@@ -17,7 +17,7 @@ const bot = new TelegramBot(token, { polling: true });
 //message processing
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
-  bot.sendMessage(chatId, "Привіт, вітаю вас!");
+  bot.sendMessage(chatId, 'Привіт, вітаю вас!');
 });
 
 bot.onText(/\/newWord (.+)/, async (msg, match) => {
@@ -43,26 +43,44 @@ bot.onText(/\/newWord (.+)/, async (msg, match) => {
         },
       };
 
-      for (const key of Object.keys(result)) {
-        const wordOption = result[key];
-        const buttonText = wordOption.translation; //button name
+      if (Object.keys(result).length > 1) {
+        const arrMessage = [];
+        for (const key of Object.keys(result)) {
+          const wordOption = result[key];
+          const buttonText = wordOption.translation; //button name
 
-        options.reply_markup.keyboard.push([{ text: buttonText }]);
+          options.reply_markup.keyboard.push([{ text: buttonText }]);
+
+          const message = formatMessage(wordOption);
+          arrMessage.push(message);
+        }
+
+        await bot.sendMessage(chatId, 'Виберіть один з варіантів:', options);
+        for (const message of arrMessage) {
+          await bot.sendMessage(chatId, message);
+        }
+      } else if (Object.keys(result).length === 1) {
+        const wordOption = result[Object.keys(result)[0]];
 
         const message = formatMessage(wordOption);
         await bot.sendMessage(chatId, message);
+      } else {
+        throw new Error();
       }
-
-      await bot.sendMessage(chatId, 'Виберіть один з варіантів:', options);
     } catch (error) {
       console.error(error);
-      await bot.sendMessage(chatId, 'Помилка при обробці запиту.');
+      await bot.sendMessage(
+        chatId,
+        'Помилка при обробці запиту або слово не існує.',
+      );
     }
   } else {
-    bot.sendMessage(chatId, 'Некоректний формат команди. Введіть команду у форматі /parse <слово>.');
+    bot.sendMessage(
+      chatId,
+      'Некоректний формат команди. Введіть команду у форматі /newWord <слово>.',
+    );
   }
 });
-
 
 function formatMessage(wordOption: any): string {
   return `
@@ -74,4 +92,4 @@ Parts of Speech: ${wordOption.partsOfSpeech}`.trim();
 }
 
 //bot start
-console.log("The bot is running!");
+console.log('The bot is running!');
