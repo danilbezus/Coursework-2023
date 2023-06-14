@@ -27,13 +27,13 @@ bot.onText(/\/newWord (.+)/, async (msg, match) => {
     const word = match[1];
 
     try {
-      const response = await fetch('http://localhost:3000/parsing', {
+      const parsingResponse = await fetch('http://localhost:3000/parsing', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ word }),
       });
 
-      const result = await response.json();
+      const wordOptions = await parsingResponse.json();
 
       const options = {
         reply_markup: {
@@ -43,11 +43,12 @@ bot.onText(/\/newWord (.+)/, async (msg, match) => {
         },
       };
 
-      if (Object.keys(result).length > 1) {
+      const selectedWord = {};
+      if (Object.keys(wordOptions).length > 1) {
         const arrMessage = [];
         const arrTranslation = [];
-        for (const key of Object.keys(result)) {
-          const wordOption = result[key];
+        for (const key of Object.keys(wordOptions)) {
+          const wordOption = wordOptions[key];
           const buttonText = wordOption.translation; //button name
 
           options.reply_markup.keyboard.push([{ text: buttonText }]);
@@ -62,28 +63,48 @@ bot.onText(/\/newWord (.+)/, async (msg, match) => {
           await bot.sendMessage(chatId, message);
         }
 
-        bot.onText(new RegExp(arrTranslation.join('|')), async (msg, match) => {
-          const selectedTranslation = match[0]; //get the text of the pressed button
-          const selectedIndex = arrTranslation.indexOf(selectedTranslation); //get the index of the selected button
+        const selectedTranslationPromise = new Promise((resolve) => {
+          bot.onText(
+            new RegExp(arrTranslation.join('|')),
+            async (msg, match) => {
+              const selectedTranslation = match[0]; //get the text of the pressed button
+              const selectedIndex = arrTranslation.indexOf(selectedTranslation); //get the index of the selected button
 
-          if (selectedIndex !== -1) {
-            const selectedOption = result[Object.keys(result)[selectedIndex]];
-            bot.sendMessage(
-              chatId,
-              `Ви вибрали переклад: ${match[0]}`,
-              { reply_markup: { remove_keyboard: true } }, //close keyboard
-            );
-            console.log(selectedOption);
-          }
+              if (selectedIndex !== -1) {
+                const selectedOption =
+                  wordOptions[Object.keys(wordOptions)[selectedIndex]];
+
+                bot.sendMessage(
+                  chatId,
+                  `Ви вибрали переклад: ${match[0]}`,
+                  { reply_markup: { remove_keyboard: true } }, //close keyboard
+                );
+
+                resolve(selectedOption); //resolve the promise with the selected option
+              }
+            },
+          );
         });
-      } else if (Object.keys(result).length === 1) {
-        const wordOption = result[Object.keys(result)[0]];
+
+        const selectedOption = await selectedTranslationPromise; //wait for the promise to be resolved
+        Object.assign(selectedWord, selectedOption);
+      } else if (Object.keys(wordOptions).length === 1) {
+        const wordOption = wordOptions[Object.keys(wordOptions)[0]];
+        Object.assign(selectedWord, wordOption);
 
         const message = formatMessage(wordOption);
         await bot.sendMessage(chatId, message);
       } else {
         throw new Error();
       }
+
+      const wordResponse = await fetch('http://localhost:3000/words', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ word, wordOption: selectedWord }),
+      });
+
+      const wordID = await wordResponse.json();
     } catch (error) {
       console.error(error);
       await bot.sendMessage(

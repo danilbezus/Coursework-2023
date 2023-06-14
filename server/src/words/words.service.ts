@@ -2,22 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Word } from './word.entity';
-import ParsingService from './parsing.service';
+import { WordOption } from './dtos/create-word.dto';
 
 @Injectable()
 export class WordsService {
   constructor(@InjectRepository(Word) private repo: Repository<Word>) {}
 
-  async create(word: string) {
-    const parsingService = new ParsingService();
-
-    const wordOptions = await parsingService.getPage(word.toLowerCase());
-    const firstOption = Object.values(wordOptions)[0];
-
+  async create(word: string, wordOption: WordOption) {
     const { translation, definition, example, pronunciation, partsOfSpeech } =
-      firstOption;
+      wordOption;
     const existingWord = await this.repo.findOne({
-      where: [{ word }, { translation }],
+      where: { word, translation },
     });
     if (!existingWord) {
       const newWord = this.repo.create({
@@ -29,6 +24,8 @@ export class WordsService {
         partsOfSpeech,
       });
       return this.repo.save(newWord);
+    } else {
+      return existingWord;
     }
   }
 }
