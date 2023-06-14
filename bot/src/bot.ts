@@ -118,19 +118,26 @@ bot.onText(/\/newWord (.+)/, async (msg, match) => {
         `Айді цього слова у базі данних слів: ${Object.values(wordId)}`,
       );
 
-      const userWordsResponse = await fetch('http://localhost:3000/user-words', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: chatId, wordId: Number(Object.values(wordId)) }),
-      });
+      const userWordsResponse = await fetch(
+        'http://localhost:3000/user-words',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: chatId,
+            wordId: Number(Object.values(wordId)),
+          }),
+        },
+      );
 
-      const userWordId = await userWordsResponse.json();
+      const userWordsId = await userWordsResponse.json();
 
       await bot.sendMessage(
         chatId,
-        `Айді цього слова у базі данних слів юзерів: ${Object.values(userWordId)}`,
+        `Айді цього слова у базі данних слів юзерів: ${Object.values(
+          userWordsId,
+        )}`,
       );
-      
     } catch (error) {
       console.error(error);
       await bot.sendMessage(
@@ -143,6 +150,30 @@ bot.onText(/\/newWord (.+)/, async (msg, match) => {
       chatId,
       'Некоректний формат команди. Введіть команду у форматі /newWord <слово>.',
     );
+  }
+});
+
+bot.onText(/\/myWords/, async (msg) => {
+  const chatId = msg.chat.id;
+
+  try {
+    const userWordsResponse = await fetch(
+      `http://localhost:3000/user-words/?userId=${chatId}`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
+
+    const userWords = await userWordsResponse.json();
+    const wordIds = userWords.map(
+      (userWord: { wordId: number }) => userWord.wordId,
+    );
+
+    console.log(wordIds);
+  } catch (error) {
+    console.error(error);
+    await bot.sendMessage(chatId, 'Помилка при обробці запиту.');
   }
 });
 
