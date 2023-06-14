@@ -17,7 +17,6 @@ export class WordsController {
   @Get()
   async getWords(@Query('id') id: number, @Res() res: Response) {
     const result = await this.wordsService.get(id);
-    console.log(result);
     return res.send(result);
   }
 }
