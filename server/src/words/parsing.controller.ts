@@ -1,15 +1,14 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import ParsingService from './parsing.service';
-import { Response } from 'express';
 
 @Controller('parsing')
 export class ParsingController {
   constructor(private parsingService: ParsingService) {}
 
   @Post()
-  async parse(@Body() body: { word: string }, @Res() res: Response) {
+  async parse(@Body() body: { word: string }) {
     const { word } = body;
     const result = await this.parsingService.getPage(word.toLowerCase());
-    return res.send(result);
+    return result;
   }
 }
