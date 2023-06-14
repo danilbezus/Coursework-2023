@@ -45,6 +45,7 @@ bot.onText(/\/newWord (.+)/, async (msg, match) => {
 
       if (Object.keys(result).length > 1) {
         const arrMessage = [];
+        const arrTranslation = [];
         for (const key of Object.keys(result)) {
           const wordOption = result[key];
           const buttonText = wordOption.translation; //button name
@@ -53,12 +54,28 @@ bot.onText(/\/newWord (.+)/, async (msg, match) => {
 
           const message = formatMessage(wordOption);
           arrMessage.push(message);
+          arrTranslation.push(wordOption.translation);
         }
 
         await bot.sendMessage(chatId, 'Виберіть один з варіантів:', options);
         for (const message of arrMessage) {
           await bot.sendMessage(chatId, message);
         }
+
+        bot.onText(new RegExp(arrTranslation.join('|')), async (msg, match) => {
+          const selectedTranslation = match[0]; //get the text of the pressed button
+          const selectedIndex = arrTranslation.indexOf(selectedTranslation); //get the index of the selected button
+
+          if (selectedIndex !== -1) {
+            const selectedOption = result[Object.keys(result)[selectedIndex]];
+            bot.sendMessage(
+              chatId,
+              `Ви вибрали переклад: ${match[0]}`,
+              { reply_markup: { remove_keyboard: true } }, //close keyboard
+            );
+            console.log(selectedOption);
+          }
+        });
       } else if (Object.keys(result).length === 1) {
         const wordOption = result[Object.keys(result)[0]];
 
