@@ -69,7 +69,8 @@ bot.onText(/\/newWord (.+)/, async (msg, match) => {
           bot.onText(
             new RegExp(arrTranslation.join('|')),
             async (msg, match) => {
-              if (!isTranslationSelected) {//flag check
+              if (!isTranslationSelected) {
+                //flag check
                 const selectedTranslation = match[0]; //get the text of the pressed button
                 const selectedIndex =
                   arrTranslation.indexOf(selectedTranslation); //get the index of the selected button
@@ -110,7 +111,26 @@ bot.onText(/\/newWord (.+)/, async (msg, match) => {
         body: JSON.stringify({ word, wordOption: selectedWord }),
       });
 
-      const wordID = await wordResponse.json();
+      const wordId = await wordResponse.json();
+
+      await bot.sendMessage(
+        chatId,
+        `Айді цього слова у базі данних слів: ${Object.values(wordId)}`,
+      );
+
+      const userWordsResponse = await fetch('http://localhost:3000/user-words', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: chatId, wordId: Number(Object.values(wordId)) }),
+      });
+
+      const userWordId = await userWordsResponse.json();
+
+      await bot.sendMessage(
+        chatId,
+        `Айді цього слова у базі данних слів юзерів: ${Object.values(userWordId)}`,
+      );
+      
     } catch (error) {
       console.error(error);
       await bot.sendMessage(
