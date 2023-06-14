@@ -63,24 +63,31 @@ bot.onText(/\/newWord (.+)/, async (msg, match) => {
           await bot.sendMessage(chatId, message);
         }
 
+        let isTranslationSelected = false;
+
         const selectedTranslationPromise = new Promise((resolve) => {
           bot.onText(
             new RegExp(arrTranslation.join('|')),
             async (msg, match) => {
-              const selectedTranslation = match[0]; //get the text of the pressed button
-              const selectedIndex = arrTranslation.indexOf(selectedTranslation); //get the index of the selected button
+              if (!isTranslationSelected) {
+                //flag check
+                const selectedTranslation = match[0]; //get the text of the pressed button
+                const selectedIndex =
+                  arrTranslation.indexOf(selectedTranslation); //get the index of the selected button
 
-              if (selectedIndex !== -1) {
-                const selectedOption =
-                  wordOptions[Object.keys(wordOptions)[selectedIndex]];
+                if (selectedIndex !== -1) {
+                  const selectedOption =
+                    wordOptions[Object.keys(wordOptions)[selectedIndex]];
 
-                bot.sendMessage(
-                  chatId,
-                  `Ви вибрали переклад: ${match[0]}`,
-                  { reply_markup: { remove_keyboard: true } }, //close keyboard
-                );
+                  bot.sendMessage(
+                    chatId,
+                    `Ви вибрали переклад: ${match[0]}`,
+                    { reply_markup: { remove_keyboard: true } }, //close keyboard
+                  );
 
-                resolve(selectedOption); //resolve the promise with the selected option
+                  isTranslationSelected = true;
+                  resolve(selectedOption); //resolve the promise with the selected option
+                }
               }
             },
           );
@@ -104,7 +111,26 @@ bot.onText(/\/newWord (.+)/, async (msg, match) => {
         body: JSON.stringify({ word, wordOption: selectedWord }),
       });
 
-      const wordID = await wordResponse.json();
+      const wordId = await wordResponse.json();
+
+      await bot.sendMessage(
+        chatId,
+        `Айді цього слова у базі данних слів: ${Object.values(wordId)}`,
+      );
+
+      const userWordsResponse = await fetch('http://localhost:3000/user-words', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: chatId, wordId: Number(Object.values(wordId)) }),
+      });
+
+      const userWordId = await userWordsResponse.json();
+
+      await bot.sendMessage(
+        chatId,
+        `Айді цього слова у базі данних слів юзерів: ${Object.values(userWordId)}`,
+      );
+      
     } catch (error) {
       console.error(error);
       await bot.sendMessage(
