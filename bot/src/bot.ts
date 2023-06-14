@@ -183,8 +183,6 @@ bot.onText(/\/mywords/, async (msg) => {
       const message = formatMessage(word);
       await bot.sendMessage(chatId, message);
     }
-
-    //console.log(words);
   } catch (error) {
     console.error(error);
     await bot.sendMessage(chatId, 'Помилка при обробці запиту.');
@@ -204,7 +202,6 @@ Definition: ${word.definition}
 Example: ${word.example}
 Pronunciation: ${word.pronunciation}
 Parts of Speech: ${word.partsOfSpeech}`;
-  console.log(message.trim());
   return message.trim();
 }
 
