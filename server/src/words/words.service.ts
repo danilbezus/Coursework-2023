@@ -3,10 +3,14 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Word } from './word.entity';
 import { WordOption } from './dtos/create-word.dto';
+import { UserWordsService } from 'src/user-words/user-words.service';
 
 @Injectable()
 export class WordsService {
-  constructor(@InjectRepository(Word) private repo: Repository<Word>) {}
+  constructor(
+    @InjectRepository(Word) private repo: Repository<Word>,
+    private readonly userWordsService: UserWordsService,
+  ) {}
 
   async create(word: string, wordOption: WordOption) {
     const { translation, definition, example, pronunciation, partsOfSpeech } =
@@ -43,13 +47,18 @@ export class WordsService {
     if (result.affected === 0) {
       return 'Слово не знайдено';
     }
+
     return 'Слово видалено';
   }
 
   async deleteByName(word: string) {
+    const allWords = await this.getByName(word);
     const result = await this.repo.delete({ word });
     if (result.affected === 0) {
-      return 'Елемент не знайдено';
+      return 'Слово не знайдено';
+    }
+    for (const elem of allWords) {
+      await this.userWordsService.delete(elem.id);
     }
     return 'Слово видалено';
   }

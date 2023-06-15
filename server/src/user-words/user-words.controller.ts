@@ -33,7 +33,7 @@ export class UserWordsController {
     @Query('userId') userId: number,
     @Query('wordId') wordId: number,
   ) {
-    const result = await this.userWordsService.delete(userId, wordId);
+    const result = await this.userWordsService.delete(wordId, userId);
     return result;
   }
 }

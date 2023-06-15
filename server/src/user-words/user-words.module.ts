@@ -8,5 +8,6 @@ import { UserWords } from './user-words.entity';
   imports: [TypeOrmModule.forFeature([UserWords])],
   providers: [UserWordsService],
   controllers: [UserWordsController],
+  exports: [UserWordsService],
 })
 export class UserWordsModule {}

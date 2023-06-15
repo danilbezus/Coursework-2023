@@ -28,7 +28,7 @@ export class UserWordsService {
     return this.repo.find({ where: { userId } });
   }
 
-  async delete(userId: number, wordId: number) {
+  async delete(wordId: number, userId?: number) {
     let result: DeleteResult;
     if (userId) {
       result = await this.repo.delete({ userId, wordId });
