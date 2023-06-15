@@ -96,7 +96,7 @@ bot.onText(/\/newword (.+)/, async (msg, match) => {
   } else {
     bot.sendMessage(
       chatId,
-      'Некоректний формат команди. Введіть команду у форматі /newWord <слово>.',
+      'Некоректний формат команди. Введіть команду у форматі /newWord <word>.',
     );
   }
 });
@@ -216,15 +216,21 @@ bot.onText(/\/getword (.+)/, async (msg, match) => {
   }
 });
 
-bot.onText(/\/deletewordbyid (.+)/, async (msg, match) => {
+bot.onText(/\/deleteword (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
 
   if (match && match[1]) {
-    const id = match[1];
+    const key = match[1];
 
     try {
+      let keyType = '';
+      if (!isNaN(Number(key))) {
+        keyType = `id`;
+      } else {
+        keyType = `word`;
+      }
       const wordResponse = await fetch(
-        `http://localhost:3000/words/?id=${id}`,
+        `http://localhost:3000/words/?${keyType}=${key}`,
         {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
@@ -241,7 +247,7 @@ bot.onText(/\/deletewordbyid (.+)/, async (msg, match) => {
   } else {
     bot.sendMessage(
       chatId,
-      'Некоректний формат команди. Введіть команду у форматі /deletewordbyid <word>.',
+      'Некоректний формат команди. Введіть команду у форматі /deleteword <id або word>.',
     );
   }
 });
