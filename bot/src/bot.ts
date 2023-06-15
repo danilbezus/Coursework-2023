@@ -137,6 +137,32 @@ bot.onText(/\/mywords/, async (msg) => {
   }
 });
 
+bot.onText(/\/getwordbyid (.+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+
+  if (match && match[1]) {
+    const id = match[1];
+
+    try {
+      const word = await fetch(`http://localhost:3000/words/?id=${id}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      await bot.sendMessage(chatId, 'Обране слово:');
+      const message = formatMessage(await word.json());
+      await bot.sendMessage(chatId, message);
+    } catch (error) {
+      console.error(error);
+      await bot.sendMessage(chatId, 'Помилка при обробці запиту.');
+    }
+  } else {
+    bot.sendMessage(
+      chatId,
+      'Некоректний формат команди. Введіть команду у форматі /getword <id>.',
+    );
+  }
+});
+
 function formatMessage(word: any): string {
   let message = '';
   if (word.hasOwnProperty('word')) {
