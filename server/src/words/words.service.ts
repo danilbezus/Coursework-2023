@@ -37,4 +37,20 @@ export class WordsService {
     const allWords = await this.repo.find({ where: { word } });
     return allWords;
   }
+
+  async deleteById(id: number) {
+    const result = await this.repo.delete(id);
+    if (result.affected === 0) {
+      return 'Слово не знайдено';
+    }
+    return 'Слово видалено';
+  }
+
+  async deleteByName(word: string) {
+    const result = await this.repo.delete({ word });
+    if (result.affected === 0) {
+      return 'Елемент не знайдено';
+    }
+    return 'Слово видалено';
+  }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Delete } from '@nestjs/common';
 import { CreateWordDto } from './dtos/create-word.dto';
 import { WordsService } from './words.service';
 
@@ -22,6 +22,19 @@ export class WordsController {
 
     if (word) {
       const result = await this.wordsService.getByName(word);
+      return result;
+    }
+  }
+
+  @Delete()
+  async deleteWord(@Query('id') id: number, @Query('word') word: string) {
+    if (id) {
+      const result = await this.wordsService.deleteById(id);
+      return result;
+    }
+
+    if (word) {
+      const result = await this.wordsService.deleteByName(word);
       return result;
     }
   }
