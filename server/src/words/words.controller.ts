@@ -14,8 +14,15 @@ export class WordsController {
   }
 
   @Get()
-  async getWords(@Query('id') id: number) {
-    const result = await this.wordsService.get(id);
-    return result;
+  async getWords(@Query('id') id: number, @Query('word') word: string) {
+    if (id) {
+      const result = await this.wordsService.getById(id);
+      return result;
+    }
+
+    if (word) {
+      const result = await this.wordsService.getByName(word);
+      return result;
+    }
   }
 }

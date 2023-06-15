@@ -28,8 +28,13 @@ export class WordsService {
       return existingWord;
     }
   }
-  async get(id: number) {
+  async getById(id: number) {
     const [word] = await this.repo.find({ where: { id } });
     return word;
+  }
+
+  async getByName(word: string) {
+    const allWords = await this.repo.find({ where: { word } });
+    return allWords;
   }
 }

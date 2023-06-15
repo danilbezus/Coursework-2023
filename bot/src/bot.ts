@@ -133,7 +133,7 @@ bot.onText(/\/mywords/, async (msg) => {
     }
   } catch (error) {
     console.error(error);
-    await bot.sendMessage(chatId, 'Помилка при обробці запиту.');
+    await bot.sendMessage(chatId, 'Помилка при обробці запиту або у вас ще немає слів.');
   }
 });
 
@@ -148,17 +148,64 @@ bot.onText(/\/getwordbyid (.+)/, async (msg, match) => {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
-      await bot.sendMessage(chatId, 'Обране слово:');
       const message = formatMessage(await word.json());
+      await bot.sendMessage(chatId, 'Обране слово:');
       await bot.sendMessage(chatId, message);
     } catch (error) {
       console.error(error);
-      await bot.sendMessage(chatId, 'Помилка при обробці запиту.');
+      await bot.sendMessage(chatId, 'Помилка при обробці запиту або слово не знайдено.');
     }
   } else {
     bot.sendMessage(
       chatId,
       'Некоректний формат команди. Введіть команду у форматі /getword <id>.',
+    );
+  }
+});
+
+bot.onText(/\/getword (.+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+
+  if (match && match[1]) {
+    const name = match[1];
+
+    try {
+      const wordRespnose = await fetch(
+        `http://localhost:3000/words/?word=${name}`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
+
+      const arrWords = await wordRespnose.json();
+      if (arrWords.length > 1) {
+        await bot.sendMessage(
+          chatId,
+          'Обране слово має декілька перекладів в базі даних:',
+        );
+        for (const word of arrWords) {
+          const message = formatMessage(word);
+          await bot.sendMessage(chatId, message);
+        }
+      } else if (arrWords.length == 1) {
+        await bot.sendMessage(chatId, 'Обране слово:');
+        const message = formatMessage(arrWords[0]);
+        await bot.sendMessage(chatId, message);
+      } else {
+        throw new Error();
+      }
+    } catch (error) {
+      console.error(error);
+      await bot.sendMessage(
+        chatId,
+        'Помилка при обробці запиту або слово не знайдене.',
+      );
+    }
+  } else {
+    bot.sendMessage(
+      chatId,
+      'Некоректний формат команди. Введіть команду у форматі /getword <word>.',
     );
   }
 });
