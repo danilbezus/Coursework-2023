@@ -24,7 +24,6 @@ export class UserWordsController {
     @Query('userId') userId: number,
     @Query('wordId') wordId: number,
   ) {
-    console.log(userId, wordId);
     const result = await this.userWordsService.delete(userId, wordId);
     return result;
   }

@@ -36,8 +36,8 @@ export class UserWordsService {
       result = await this.repo.delete({ wordId });
     }
     if (result.affected === 0) {
-      return 'Слово не знайдено';
+      return false;
     }
-    return 'Слово видалено';
+    return true;
   }
 }

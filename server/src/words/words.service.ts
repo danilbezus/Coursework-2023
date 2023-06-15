@@ -45,21 +45,21 @@ export class WordsService {
   async deleteById(id: number) {
     const result = await this.repo.delete(id);
     if (result.affected === 0) {
-      return 'Слово не знайдено';
+      return false;
     }
 
-    return 'Слово видалено';
+    return true;
   }
 
   async deleteByName(word: string) {
     const allWords = await this.getByName(word);
     const result = await this.repo.delete({ word });
     if (result.affected === 0) {
-      return 'Слово не знайдено';
+      return false;
     }
     for (const elem of allWords) {
       await this.userWordsService.delete(elem.id);
     }
-    return 'Слово видалено';
+    return true;
   }
 }
