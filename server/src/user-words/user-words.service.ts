@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserWords } from './user-words.entity';
 
@@ -29,7 +29,12 @@ export class UserWordsService {
   }
 
   async delete(userId: number, wordId: number) {
-    const result = await this.repo.delete({ userId, wordId });
+    let result: DeleteResult;
+    if (userId) {
+      result = await this.repo.delete({ userId, wordId });
+    } else {
+      result = await this.repo.delete({ wordId });
+    }
     if (result.affected === 0) {
       return 'Слово не знайдено';
     }
