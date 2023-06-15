@@ -20,14 +20,6 @@ export class UserWordsController {
   }
 
   @Delete()
-  async deleteUserWord(
-    @Query('userId') userId: number,
-    @Query('wordId') wordId: number,
-  ) {
-    const result = await this.userWordsService.delete(userId, wordId);
-    return result;
-  }
-
   async deleteWord(
     @Query('userId') userId: number,
     @Query('wordId') wordId: number,

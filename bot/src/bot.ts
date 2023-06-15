@@ -252,6 +252,36 @@ bot.onText(/\/deleteword (.+)/, async (msg, match) => {
   }
 });
 
+bot.onText(/\/deletemywordbyid (.+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+
+  if (match && match[1]) {
+    const wordId = match[1];
+
+    try {
+      const wordResponse = await fetch(
+        `http://localhost:3000/user-words/?userId=${chatId}&wordId=${wordId}`,
+        {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
+
+      const result = await wordResponse.json();
+      if (result) await bot.sendMessage(chatId, 'Слово видалено');
+      else await bot.sendMessage(chatId, 'Слово не знайдено');
+    } catch (error) {
+      console.error(error);
+      await bot.sendMessage(chatId, 'Помилка при обробці запиту.');
+    }
+  } else {
+    bot.sendMessage(
+      chatId,
+      'Некоректний формат команди. Введіть команду у форматі /deleteword <id або word>.',
+    );
+  }
+});
+
 function formatMessage(word: any): string {
   let message = '';
   if (word.hasOwnProperty('word')) {
