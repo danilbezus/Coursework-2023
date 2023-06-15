@@ -27,4 +27,12 @@ export class UserWordsService {
   async get(userId: number) {
     return this.repo.find({ where: { userId } });
   }
+
+  async delete(userId: number, wordId: number) {
+    const result = await this.repo.delete({ userId, wordId });
+    if (result.affected === 0) {
+      return 'Слово не знайдено';
+    }
+    return 'Слово видалено';
+  }
 }
