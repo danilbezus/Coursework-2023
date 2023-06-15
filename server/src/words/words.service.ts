@@ -47,7 +47,7 @@ export class WordsService {
     if (result.affected === 0) {
       return false;
     }
-
+    await this.userWordsService.delete(id);
     return true;
   }
 
