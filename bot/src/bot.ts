@@ -23,7 +23,7 @@ bot.onText(/\/start/, (msg) => {
 bot.onText(/\/newword (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
 
-  if (match && match[1]) {
+  if (match && match[1] && /^[^\s]+$/.test(match[1])) {
     const word = match[1];
 
     try {
@@ -50,7 +50,8 @@ bot.onText(/\/newword (.+)/, async (msg, match) => {
         const message = formatMessage(wordOption);
         await bot.sendMessage(chatId, message);
       } else {
-        throw new Error();
+        await bot.sendMessage(chatId, 'Слово не існує.');
+        return;
       }
 
       const wordResponse = await fetch('http://localhost:3000/words', {
@@ -88,10 +89,7 @@ bot.onText(/\/newword (.+)/, async (msg, match) => {
       );
     } catch (error) {
       console.error(error);
-      await bot.sendMessage(
-        chatId,
-        'Помилка при обробці запиту або слово не існує.',
-      );
+      await bot.sendMessage(chatId, 'Помилка при обробці запиту.');
     }
   } else {
     bot.sendMessage(
@@ -143,7 +141,7 @@ bot.onText(/\/mywords/, async (msg) => {
 bot.onText(/\/getwordbyid (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
 
-  if (match && match[1]) {
+  if (match && match[1] && /^[^\s]+$/.test(match[1])) {
     const id = match[1];
 
     try {
@@ -164,7 +162,7 @@ bot.onText(/\/getwordbyid (.+)/, async (msg, match) => {
   } else {
     bot.sendMessage(
       chatId,
-      'Некоректний формат команди. Введіть команду у форматі /getword <id>.',
+      'Некоректний формат команди. Введіть команду у форматі /getwordbyid <id>.',
     );
   }
 });
@@ -172,7 +170,7 @@ bot.onText(/\/getwordbyid (.+)/, async (msg, match) => {
 bot.onText(/\/getword (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
 
-  if (match && match[1]) {
+  if (match && match[1] && /^[^\s]+$/.test(match[1])) {
     const name = match[1];
 
     try {
@@ -199,13 +197,13 @@ bot.onText(/\/getword (.+)/, async (msg, match) => {
         const message = formatMessage(arrWords[0]);
         await bot.sendMessage(chatId, message);
       } else {
-        throw new Error();
+        await bot.sendMessage(chatId, 'Слово не знайдене.');
       }
     } catch (error) {
       console.error(error);
       await bot.sendMessage(
         chatId,
-        'Помилка при обробці запиту або слово не знайдене.',
+        'Помилка при обробці запиту.',
       );
     }
   } else {
@@ -219,7 +217,7 @@ bot.onText(/\/getword (.+)/, async (msg, match) => {
 bot.onText(/\/deleteword (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
 
-  if (match && match[1]) {
+  if (match && match[1] && /^[^\s]+$/.test(match[1])) {
     const key = match[1];
 
     try {
@@ -255,7 +253,7 @@ bot.onText(/\/deleteword (.+)/, async (msg, match) => {
 bot.onText(/\/deletemywordbyid (.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
 
-  if (match && match[1]) {
+  if (match && match[1] && /^[^\s]+$/.test(match[1])) {
     const wordId = match[1];
 
     try {
@@ -277,7 +275,50 @@ bot.onText(/\/deletemywordbyid (.+)/, async (msg, match) => {
   } else {
     bot.sendMessage(
       chatId,
-      'Некоректний формат команди. Введіть команду у форматі /deleteword <id або word>.',
+      'Некоректний формат команди. Введіть команду у форматі /deletemywordbyid <id>.',
+    );
+  }
+});
+
+bot.onText(/\/deletemyword (.+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+
+  if (match && match[1] && /^[^\s]+$/.test(match[1])) {
+    const word = match[1];
+
+    try {
+      let result: boolean;
+      const wordResponse = await fetch(
+        `http://localhost:3000/words/?word=${word}`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
+      const arrWords = await wordResponse.json();
+      for (const word of arrWords) {
+        const userWordsResponse = await fetch(
+          `http://localhost:3000/user-words/?userId=${chatId}&wordId=${word.id}`,
+          {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+          },
+        );
+        if (await userWordsResponse.json()) {
+          result = true;
+        }
+      }
+
+      if (result) await bot.sendMessage(chatId, 'Слово видалено');
+      else await bot.sendMessage(chatId, 'Слово не знайдено');
+    } catch (error) {
+      console.error(error);
+      await bot.sendMessage(chatId, 'Помилка при обробці запиту.');
+    }
+  } else {
+    bot.sendMessage(
+      chatId,
+      'Некоректний формат команди. Введіть команду у форматі /deletemyword <word>.',
     );
   }
 });
