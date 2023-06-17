@@ -20,7 +20,7 @@ bot.onText(/\/start/, (msg) => {
   bot.sendMessage(chatId, 'Привіт, вітаю вас!');
 });
 
-bot.onText(/\/newword (.+)/, async (msg, match) => {
+bot.onText(/^\/newword(?:\s+(.+))?$/, async (msg, match) => {
   const chatId = msg.chat.id;
 
   if (match && match[1] && /^[^\s]+$/.test(match[1])) {
@@ -138,7 +138,7 @@ bot.onText(/\/mywords/, async (msg) => {
   }
 });
 
-bot.onText(/\/getwordbyid (.+)/, async (msg, match) => {
+bot.onText(/^\/getwordbyid(?:\s+(.+))?$/, async (msg, match) => {
   const chatId = msg.chat.id;
 
   if (match && match[1] && /^[^\s]+$/.test(match[1])) {
@@ -167,7 +167,7 @@ bot.onText(/\/getwordbyid (.+)/, async (msg, match) => {
   }
 });
 
-bot.onText(/\/getword (.+)/, async (msg, match) => {
+bot.onText(/^\/getword(?:\s+(.+))?$/, async (msg, match) => {
   const chatId = msg.chat.id;
 
   if (match && match[1] && /^[^\s]+$/.test(match[1])) {
@@ -214,7 +214,7 @@ bot.onText(/\/getword (.+)/, async (msg, match) => {
   }
 });
 
-bot.onText(/\/deleteword (.+)/, async (msg, match) => {
+bot.onText(/^\/deleteword(?:\s+(.+))?$/, async (msg, match) => {
   const chatId = msg.chat.id;
 
   if (match && match[1] && /^[^\s]+$/.test(match[1])) {
@@ -250,7 +250,7 @@ bot.onText(/\/deleteword (.+)/, async (msg, match) => {
   }
 });
 
-bot.onText(/\/deletemywordbyid (.+)/, async (msg, match) => {
+bot.onText(/^\/deletemywordbyid(?:\s+(.+))?$/, async (msg, match) => {
   const chatId = msg.chat.id;
 
   if (match && match[1] && /^[^\s]+$/.test(match[1])) {
@@ -280,7 +280,7 @@ bot.onText(/\/deletemywordbyid (.+)/, async (msg, match) => {
   }
 });
 
-bot.onText(/\/deletemyword (.+)/, async (msg, match) => {
+bot.onText(/^\/deletemyword(?:\s+(.+))?$/, async (msg, match) => {
   const chatId = msg.chat.id;
 
   if (match && match[1] && /^[^\s]+$/.test(match[1])) {
